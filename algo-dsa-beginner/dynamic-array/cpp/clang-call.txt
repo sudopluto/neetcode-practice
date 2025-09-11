@@ -1,0 +1,2 @@
+clang++ -std=c++23 -pedantic-errors -Wall -Wextra -Werror -fsanitize=address dynamic-array.cpp -o dynamic-array && ./dynamic-array
+clang++ -std=c++23 -pedantic-errors -Wall -Wextra -Werror cherno-vector-attempt.cpp -o cherno-vector-attempt && ./cherno-vector-attempt
