@@ -14,14 +14,25 @@ class Vector
    }
 
    void resize(size_t new_capacity) {
+       auto align_val = static_cast<std::align_val_t>(alignof(T));
+
+       // resize() is just special case of erasing underying container, can handle that in explict case
+       if (new_capacity == 0) {
+           clear();
+           ::operator delete(m_data, m_capacity * sizeof(T), align_val);
+           m_data = nullptr;
+           m_size = 0;
+           m_capacity = 0;
+           return;
+       }
+
        // never really need to call default constructor T() since we are copying over data anyways
        // just need to alloc memory block of correct size
        //T* new_data = new T[m_capacity];
-       auto align_val = static_cast<std::align_val_t>(alignof(T));
        T* new_data = static_cast<T*>(::operator new(new_capacity * sizeof(T), align_val));
 
        for (size_t i = 0; i < m_size; i++) {
-           new_data[i] = std::move(m_data[i]);
+           new (&new_data[i]) T(std::move(m_data[i]));
        }
 
        // need to cache size since clear sets size back to zero
@@ -30,7 +41,7 @@ class Vector
        m_size = size_temp;
 
        // again don't really need to call destructors, just need to delete memory block
-       // let move handle memory management
+       // let clear() & std::move() handle memory management
        //delete[] m_data;
        ::operator delete(m_data, m_capacity * sizeof(T), align_val);
        m_data = new_data;
@@ -50,7 +61,6 @@ public:
         // don't really need to call destructors,
         // call clear and then delete memory block
         // delete[] m_data;
-        clear();
         resize(0);
     }
 
@@ -59,7 +69,8 @@ public:
         if (m_size == m_capacity) {
             resize();
         }
-        m_data[m_size++] = val;
+        new (&m_data[m_size]) T(val);
+        ++m_size;
         std::cout << "Vector::push_back<copy>() end\n";
     }
 
@@ -68,7 +79,7 @@ public:
         if (m_size == m_capacity) {
             resize();
         }
-        m_data[m_size++] = std::move(val);
+        new (&m_data[m_size++]) T(std::move(val));
         std::cout << "Vector::push_back<move>() end\n";
     }
 
@@ -78,10 +89,10 @@ public:
         if (m_size == m_capacity) {
             resize();
         }
-        //m_data[m_size++] = T(std::forward<Args>(args)...);
         new (&m_data[m_size++]) T(std::forward<Args>(args)...);
-        return m_data[m_size - 1];
         std::cout << "Vector::push_back() end\n";
+
+        return m_data[m_size - 1];
     }
 
     void pop_back() {
@@ -149,7 +160,6 @@ public:
         std::cout << "Vec3 Const Scalar\n";
         test_buff = new float[3];
         test_buff[0] = 1;
-        std::cout << "test_buff[0] valid here: " << test_buff[0] << "\n";
         test_buff[1] = 2;
         test_buff[2] = 3;
     }
@@ -175,10 +185,19 @@ public:
         x = other.x;
         y = other.y;
         z = other.z;
-        if (test_buff)
-        test_buff[0] = other.test_buff[0];
-        test_buff[1] = other.test_buff[1];
-        test_buff[2] = other.test_buff[2];
+        if (other.test_buff != nullptr) {
+            if (test_buff == nullptr) {
+               test_buff = new float[3];
+            }
+            test_buff[0] = other.test_buff[0];
+            test_buff[1] = other.test_buff[1];
+            test_buff[2] = other.test_buff[2];
+        } else {
+            if (test_buff != nullptr) {
+                delete[] test_buff;
+                test_buff = nullptr;
+            }
+        }
         return *this;
     }
 
@@ -186,12 +205,12 @@ public:
     Vec3(Vec3&& other) : Vec3(other.x, other.y, other.z) {
         std::cout << "Vec3 Move Construct \n";
 
-        if (other.test_buff != nullptr) {
+        if (this != &other) {
+            if (test_buff != nullptr) {
+                delete[] test_buff;
+            }
 
-            test_buff[0] = other.test_buff[0];
-            test_buff[1] = other.test_buff[1];
-            test_buff[2] = other.test_buff[2];
-            delete[] other.test_buff;
+            test_buff = other.test_buff;
             other.test_buff = nullptr;
         }
     }
@@ -203,17 +222,12 @@ public:
             x = other.x;
             y = other.y;
             z = other.z;
-            if (test_buff == nullptr) {
-                std::cout << "somehow test_buff nullptr here \n";
+
+            if (test_buff != nullptr) {
+                delete[] test_buff;
             }
-            std::cout << "test_buff[0] valid here?: " << test_buff[0] << "\n";
-            if (other.test_buff != nullptr) {
-                test_buff[0] = other.test_buff[0];
-                test_buff[1] = other.test_buff[1];
-                test_buff[2] = other.test_buff[2];
-                delete[] other.test_buff;
-                other.test_buff = nullptr;
-            }
+            test_buff = other.test_buff;
+            other.test_buff = nullptr;
         }
         return *this;
     }
