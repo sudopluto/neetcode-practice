@@ -7,12 +7,6 @@ class Vector
    size_t m_size{0};
    size_t m_capacity{2};
 
-   void resize() {
-       std::cout << "Vector::resize() called\n";
-       resize(m_capacity * 2);
-       std::cout << "Vector::resize() end\n";
-   }
-
    void resize(size_t new_capacity) {
        auto align_val = static_cast<std::align_val_t>(alignof(T));
 
@@ -32,6 +26,9 @@ class Vector
        T* new_data = static_cast<T*>(::operator new(new_capacity * sizeof(T), align_val));
 
        for (size_t i = 0; i < m_size; i++) {
+           // if new_data is garbage, then why segfaulting on deleting test_buf from old?
+           // if uninitialized, then pointer is full of garbage instead of being nullptr
+           // new_data[i] = T(std::move(m_data[i]));
            new (&new_data[i]) T(std::move(m_data[i]));
        }
 
@@ -46,6 +43,12 @@ class Vector
        ::operator delete(m_data, m_capacity * sizeof(T), align_val);
        m_data = new_data;
        m_capacity = new_capacity;
+   }
+
+   void resize() {
+       std::cout << "Vector::resize() called\n";
+       resize(m_capacity * 2);
+       std::cout << "Vector::resize() end\n";
    }
 
 public:

@@ -16,7 +16,32 @@ void print_vec(const vector<T>& nums) {
 
 class Solution {
 public:
+
     int removeDuplicates(vector<int>& nums) {
+        // 0 or 1 dont do anything
+        if (nums.size() < 2) {
+            return nums.size();
+        }
+
+        size_t r_head = 1;
+        size_t w_head = 1;
+
+        while (r_head < nums.size()) {
+            if (nums[w_head - 1] != nums[r_head]) {
+                nums[w_head] = nums[r_head];
+                ++w_head;
+            }
+            ++r_head;
+        }
+
+        nums.resize(w_head);
+
+        print_vec(nums);
+        return w_head;
+
+    }
+
+    int removeDuplicates_old(vector<int>& nums) {
         if (nums.size() == 0) {
             std::cout << "[ ]\n";
             return 0;
@@ -37,8 +62,9 @@ public:
             }
         }
 
-        auto p_vec = vector<int>(nums.begin(), nums.begin() + w_head);
-        print_vec(p_vec);
+
+        nums.resize(w_head);
+        print_vec(nums);
 
         return k;
     }

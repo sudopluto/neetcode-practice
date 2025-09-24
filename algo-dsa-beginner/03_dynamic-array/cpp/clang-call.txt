@@ -1,3 +1,3 @@
-clang++ -std=c++23 -pedantic-errors -Wall -Wextra -Werror -fsanitize=address dynamic-array.cpp -o dynamic-array && ./dynamic-array
-clang++ -std=c++23 -pedantic-errors -Wall -Wextra -Werror cherno-vector-attempt.cpp -o cherno-vector-attempt && ./cherno-vector-attempt
-clang++ -std=c++23 -pedantic-errors -Wall -Wextra -Werror -g cherno-example.cpp -o cherno-example && ./cherno-example
+clang++ -std=c++23 -pedantic-errors -Wall -Wextra -Werror -g -fsanitize=address dynamic-array.cpp -o ./bin/dynamic-array && ./bin/dynamic-array
+clang++ -std=c++23 -pedantic-errors -Wall -Wextra -Werror -g -fsanitize=address cherno-vector-attempt.cpp -o ./bin/cherno-vector-attempt && ./bin/cherno-vector-attempt
+clang++ -std=c++23 -pedantic-errors -Wall -Wextra -Werror -g -fsanitize=address cherno-example.cpp -o ./bin/cherno-example && ./bin/cherno-example

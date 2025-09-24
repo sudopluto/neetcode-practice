@@ -1,0 +1,2 @@
+clang++ -std=c++23 -pedantic-errors -Wall -Wextra -Werror -g -fsanitize=address remove-dup-sorted.cpp -o ./bin/remove-dup-sorted && ./bin/remove-dup-sorted
+clang++ -std=c++23 -pedantic-errors -Wall -Wextra -Werror -g -fsanitize=address remove-ele.cpp -o ./bin/remove-ele && ./bin/remove-ele

@@ -1,5 +1,22 @@
 class Solution:
-    def removeElement(self, nums: list[int], val: int) -> int:
+
+    def removeElement(self, nums: list[int], val:int) -> int:
+        # lets inchworm l2r
+
+        r_head = 0
+        w_head = 0
+
+        while (r_head < len(nums)):
+            if (nums[r_head] != val):
+                nums[w_head] = nums[r_head]
+                w_head += 1
+
+            r_head += 1
+
+        del nums[w_head:]
+        return w_head
+
+    def removeElement2(self, nums: list[int], val: int) -> int:
         # could also do solution where stack allocate temp array to copy valid elements in,
         # and then copy back valid entries back into orignal array
         # or could force a reorder
@@ -24,7 +41,7 @@ class Solution:
             else:
                 lr_head += 1
 
-        
+
         # forgot edge case if entire array is made up of value to remove
         return 0 if lr_head == 0 else lr_head + 1
 
@@ -44,13 +61,15 @@ print()
 print(f"ex1: {ex1}, removing: 1")
 ret = sol.removeElement(ex1, 1)
 print(f"expected: {ex1_out}")
-print(f"ex1 ret = {ret}")
+print(f"actual: {ex1}")
 print(f"expected: {ex1_ret}")
+print(f"ex1 ret = {ret}")
 print()
 
 print(f"ex2: {ex2}, removing: 2")
 ret = sol.removeElement(ex2, 2)
 print(f"expected: {ex2_out}")
-print(f"ex2 ret = {ret}")
+print(f"actual: {ex2}")
 print(f"expected: {ex2_ret}")
+print(f"ex2 ret = {ret}")
 print()
